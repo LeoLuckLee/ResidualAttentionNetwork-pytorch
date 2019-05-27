@@ -1,0 +1,23 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.572
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "ResidualAttentionNetwork-pytorch", "ResidualAttentionNetwork-pytorch.pyproj", "{24F9436A-E941-463E-BF50-FB8AD774B4BB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{24F9436A-E941-463E-BF50-FB8AD774B4BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24F9436A-E941-463E-BF50-FB8AD774B4BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3FD50780-CC13-4FD6-B13B-A160C15AD3B1}
+	EndGlobalSection
+EndGlobal

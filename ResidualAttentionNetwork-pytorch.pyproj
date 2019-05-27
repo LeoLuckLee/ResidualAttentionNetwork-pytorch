@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{24f9436a-e941-463e-bf50-fb8ad774b4bb}</ProjectGuid>
+    <ProjectHome />
+    <StartupFile>Residual-Attention-Network\lisa_process.py</StartupFile>
+    <SearchPath>Residual-Attention-Network</SearchPath>
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <ProjectTypeGuids>{888888a0-9f3d-457c-b088-3a5042f75d52}</ProjectTypeGuids>
+    <LaunchProvider>Standard Python launcher</LaunchProvider>
+    <InterpreterId>Global|PythonCore|3.6</InterpreterId>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
+  <PropertyGroup>
+    <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">10.0</VisualStudioVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Residual-Attention-Network\lisa_process.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Residual-Attention-Network\model\attention_module.py" />
+    <Compile Include="Residual-Attention-Network\model\basic_layers.py" />
+    <Compile Include="Residual-Attention-Network\model\residual_attention_network.py" />
+    <Compile Include="Residual-Attention-Network\lisa_dataset.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Residual-Attention-Network\model\spp_layer.py" />
+    <Compile Include="Residual-Attention-Network\model\spp_layer_class.py" />
+    <Compile Include="Residual-Attention-Network\train.py" />
+    <Compile Include="Residual-Attention-Network\train_mixup.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Residual-Attention-Network\data\cifar-10-batches-py\readme.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Residual-Attention-Network" />
+    <Folder Include="Residual-Attention-Network\data\" />
+    <Folder Include="Residual-Attention-Network\data\cifar-10-batches-py" />
+    <Folder Include="Residual-Attention-Network\model" />
+  </ItemGroup>
+  <ItemGroup>
+    <InterpreterReference Include="Global|PythonCore|3.6" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
+</Project>

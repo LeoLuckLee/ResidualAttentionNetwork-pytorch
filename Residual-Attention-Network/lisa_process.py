@@ -19,6 +19,7 @@ model_file = 'lisa_model_92_mixup300_normal20.pkl'
 split_ratio_train = 0.8
 is_train = True
 is_pretrain = False
+train_batch_size = 64
 test_batch_size = 20
 
 def mixup_data(x, y, alpha=1.0, use_cuda=True):
@@ -38,23 +39,19 @@ def mixup_data(x, y, alpha=1.0, use_cuda=True):
     y_a, y_b = y, y[index]
     return mixed_x, y_a, y_b, lam
 
-
 def mixup_criterion(criterion, pred, y_a, y_b, lam):
     return lam * criterion(pred, y_a) + (1 - lam) * criterion(pred, y_b)
 
-
-# for test
-def test(model, test_loader, btrain=False, model_file=model_file):
-    # Test
-    if not btrain:
-        model.load_state_dict(torch.load('last_lisa_model_92_mixup300_normal20.pkl'))
+def test(model, test_loader, model_file=None):
+    if model_file is not None:
+        model.load_state_dict(torch.load(model_file))
     model.eval()
 
     correct = 0
     total = 0
-    #
-    class_correct = list(0. for i in range(test_batch_size))
-    class_total = list(0. for i in range(test_batch_size))
+    
+    class_correct = list(0. for i in range(len(classes)))
+    class_total = list(0. for i in range(len(classes)))
 
     for images, labels in test_loader:
         images = Variable(images.cuda())
@@ -63,7 +60,7 @@ def test(model, test_loader, btrain=False, model_file=model_file):
         _, predicted = torch.max(outputs.data, 1)
         total += labels.size(0)
         correct += (predicted == labels.data).sum()
-        #
+        
         c = (predicted == labels.data).squeeze()
         for i in range(len(labels.data)):
             label = labels.data[i]
@@ -72,20 +69,20 @@ def test(model, test_loader, btrain=False, model_file=model_file):
 
     print('Accuracy of the model on the test images: %.2f %% (%d/%d)' % (100 * float(correct) / total, correct, total))
     # print('Accuracy of the model on the test images:', float(correct)/total)
-    for i in range(20):
+    for i in range(len(classes)):
         print('Accuracy of %5s : %.2f %% (%d/%d)' % (
             classes[i], 100 * float(class_correct[i]) / class_total[i], class_correct[i], class_total[i]))
-    return correct / total
+    return float(correct) / total # compatible with Python 2.7
 
 if __name__ == '__main__':
     # Image Preprocessing
     data_transform = transforms.ToTensor()
     
     # dataset
-    lisa_dataset = lisa_dataset(root = './Residual-Attention-Network/annotations/',
+    lisa_dataset = lisa_dataset(root = './Residual-Attention-Network/annotations/', # use root = './annotations/' for serve
                                 transform = data_transform)
     total_num = len(lisa_dataset)
-    train_num = round(split_ratio_train * total_num) 
+    train_num = int(round(split_ratio_train * total_num)) # compatible with Python 2.7
     test_num = total_num - train_num
     lisa_datasets = random_split(lisa_dataset, [ train_num, test_num ])
     train_dataset = lisa_datasets[0]
@@ -93,7 +90,7 @@ if __name__ == '__main__':
 
     # Data Loader (Input Pipeline)
     train_loader = torch.utils.data.DataLoader(dataset=train_dataset, 
-                                               batch_size=64, 
+                                               batch_size=train_batch_size, 
                                                shuffle=True, 
                                                num_workers=8)
     test_loader = torch.utils.data.DataLoader(dataset=test_dataset, 
@@ -111,7 +108,7 @@ if __name__ == '__main__':
     acc_best = 0
     total_epoch = 320
     if is_train is True:
-        if is_pretrain == True:
+        if is_pretrain is True:
             model.load_state_dict((torch.load(model_file)))
         # Training
         for epoch in range(total_epoch):
@@ -141,12 +138,11 @@ if __name__ == '__main__':
                     loss = criterion(outputs, labels)
                     loss.backward()
                     optimizer.step()
-                # print("hello")
                 if (i+1) % 10 == 0 or (i+1) == len(train_loader) or i == 0:
                     print("Epoch [%d/%d], Iter [%d/%d] Loss: %.4f" %(epoch+1, total_epoch, i+1, len(train_loader), loss.data))
-            print('the epoch takes time:',time.time()-tims)
+            print('the epoch takes time:',time.time() - tims)
             print('evaluate test set:')
-            acc = test(model, test_loader, btrain=True)
+            acc = test(model, test_loader)
             if acc > acc_best:
                 acc_best = acc
                 print('current best acc,', acc_best)
@@ -158,10 +154,21 @@ if __name__ == '__main__':
                 for param_group in optimizer.param_groups:
                     param_group['lr'] = lr
                     print(param_group['lr'])
-                # optimizer = torch.optim.Adam(model.parameters(), lr=lr)
-                # optim.SGD(model.parameters(), lr=lr, momentum=0.9, nesterov=True, weight_decay=0.0001)
-        # Save the Model
-        torch.save(model.state_dict(), 'last_lisa_model_92_mixup300_normal20.pkl')
+                #optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+                #optim.SGD(model.parameters(), lr=lr, momentum=0.9, nesterov=True, weight_decay=0.0001)
 
-    else:
-        test(model, test_loader, btrain=False)
+        # Save the Model (epoch==320)
+        #torch.save(model.state_dict(), model_file)
+
+        # After training test
+        print('Training Completed.')
+        print('The best accuracy is %.2f %%' % (100 * float(acc_best)))
+
+        # model.load_state_dict(torch.load(model_file))
+        print('The best accuracy of the model on the train set:')
+        test(model, train_loader, model_file)
+        print('The best accuracy of the model on the test set:')
+        test(model, test_loader, model_file)
+
+    else: # is_train is False
+        test(model, test_loader, model_file)
